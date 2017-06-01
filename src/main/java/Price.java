@@ -86,6 +86,35 @@ public class Price implements Comparable<Price> {
     private static final SimpleDateFormat DATE_TIME_FORMATTER = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Price price = (Price) o;
+
+        if (id != price.id) return false;
+        if (number != price.number) return false;
+        if (depart != price.depart) return false;
+        if (value != price.value) return false;
+        if (product_code != null ? !product_code.equals(price.product_code) : price.product_code != null) return false;
+        if (begin != null ? !begin.equals(price.begin) : price.begin != null) return false;
+        return end != null ? end.equals(price.end) : price.end == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (product_code != null ? product_code.hashCode() : 0);
+        result = 31 * result + number;
+        result = 31 * result + depart;
+        result = 31 * result + (begin != null ? begin.hashCode() : 0);
+        result = 31 * result + (end != null ? end.hashCode() : 0);
+        result = 31 * result + (int) (value ^ (value >>> 32));
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Price{" +
                 "id=" + id +

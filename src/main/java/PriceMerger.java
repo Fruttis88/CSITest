@@ -1,4 +1,5 @@
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PriceMerger {
 
@@ -50,7 +51,7 @@ public class PriceMerger {
                 if (a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && DateUtil.proxyIntersectLastElement(a.getBegin(), a.getEnd(), b.getBegin(), b.getEnd())) {
                     resultList.add(new Price(a.getProduct_code(), a.getNumber(), a.getDepart(), b.getEnd(), a.getEnd(), a.getValue()));
                     break;
-                } else if (a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && DateUtil.proxyIntersectMiddleElement(a.getBegin(), a.getEnd(), b.getEnd())) {
+                } else if (a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && DateUtil.proxyIntersectMiddleElement(a.getBegin(), a.getEnd(), b.getBegin(), b.getEnd())) {
                     break;
                 } else {
                     count++;
@@ -60,6 +61,26 @@ public class PriceMerger {
                 }
             }
         }
-        return resultList;
+
+        CopyOnWriteArrayList<Price> arr = new CopyOnWriteArrayList<>(resultList);
+
+        return new TreeSet<>(recurs(arr));
+    }
+
+
+    private static CopyOnWriteArrayList<Price> recurs(CopyOnWriteArrayList<Price> arr){
+        if (arr.size() > 1) {
+            for (Price a : arr) {
+                for (Price b : arr) {
+                    if (DateUtil.resultUnion(a.getBegin(), a.getEnd(), b.getBegin()) && a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && a.getValue() == b.getValue()) {
+                        arr.add(new Price(a.getProduct_code(), a.getNumber(), a.getDepart(), a.getBegin(), b.getEnd(), a.getValue()));
+                        arr.remove(a);
+                        arr.remove(b);
+                        recurs(arr);
+                    }
+                }
+            }
+        }
+        return arr;
     }
 }
