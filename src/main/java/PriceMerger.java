@@ -71,14 +71,12 @@ public class PriceMerger {
     private static CopyOnWriteArrayList<Price> recurs(CopyOnWriteArrayList<Price> arr){
         if (arr.size() > 1) {
             for (Price a : arr) {
-                for (Price b : arr) {
-                    if (DateUtil.resultUnion(a.getBegin(), a.getEnd(), b.getBegin()) && a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && a.getValue() == b.getValue()) {
-                        arr.add(new Price(a.getProduct_code(), a.getNumber(), a.getDepart(), a.getBegin(), b.getEnd(), a.getValue()));
-                        arr.remove(a);
-                        arr.remove(b);
-                        recurs(arr);
-                    }
-                }
+                arr.stream().filter(b -> DateUtil.resultUnion(a.getBegin(), a.getEnd(), b.getBegin()) && a.getProduct_code().equals(b.getProduct_code()) && a.getNumber() == b.getNumber() && a.getDepart() == b.getDepart() && a.getValue() == b.getValue()).forEach(b -> {
+                    arr.add(new Price(a.getProduct_code(), a.getNumber(), a.getDepart(), a.getBegin(), b.getEnd(), a.getValue()));
+                    arr.remove(a);
+                    arr.remove(b);
+                    recurs(arr);
+                });
             }
         }
         return arr;
